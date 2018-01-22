@@ -39,15 +39,15 @@ class Box(object):
         size (*dimension*-dimensional numpy array of float): 1d-3d numpy array giving size of the box in each direction
         center (*dimension*-dimensional numpy array of loat): 1d-3d numpy array locating the center of the box (always the origin)
         particles (list of Particle): list of particles in the box
-        positions (python list of *dimension*-dimensional numpy arrays with the position of all the particles, for ease of use... only
-                create if needed using a set method? and always store if created?)
-                region (*dimension*x2-dimensional numpy array of float): specifies the region
-                in space that the box covers (automatically computed from the center and the size of the box?)
+        positions (N x *dimension* numpy array (N=#particles)): with the position of all the particles
         LJpotential (float): Lennard Jones Potential of the system (calculated based on the positions of the particles in *particles*)
         temp (float): temperature in the box
-        ????LJneighbourlist (list of numpy arrays of int): a list with of same size as *particles*,
+        LJneighbourlists (numpy array of numpy arrays of int (i.e. NxN of int where N = # particles)): 
+                                                     an array of same size as *particles*,
                                                      with a numpy array of int for each particle listing the indices of the 
                                                      neighbouring particles (particles within the LJ cutoff radius)
+        epsilons (numpy array of float): array containing epsilon for each particle in box
+        sigmas (numpy array of float): array containing sigma for each particle in box
         r_c_LJ (float): cutoff radius for LJ potential calculation
         r_skin_LJ (float): size of skin region for LJ potential calculation 
     """
@@ -63,6 +63,14 @@ class Box(object):
         self.particles = particles
         self.LJpotential = None
         self.temp = temp
+
+        self.LJneighbourlists = None
+        self.sigmas = np.zeros(len(particles))
+        self.epsilons = np.zeros(len(particles))
+        for i in range(len(self.sigmas)):
+            self.sigmas[i] = particles[i].sigmaLJ
+            self.epsilons[i] = particles[i].epsilonLJ
+
         self.Cpotential = None
         self.pos_history = None
         self.pot_history = None
@@ -74,15 +82,15 @@ class Box(object):
         self.make_positions_list()
 
     def compute_LJneighbourlist(self, r_cut, r_skin):
-        self.particles = neighbourlist.verlet_neighbourlist(self.particles, r_cut, r_skin)
+        self.LJneighbourlists = neighbourlist.verlet_neighbourlist(self.positions, r_cut, r_skin)
 
     def compute_LJ_potential(self, r_cut, r_skin):
-        self.LJpotential = lennardjones.LJ_potential(self.particles, r_cut, r_skin)
+        self.LJpotential = lennardjones.LJ_potential(self.positions, self.LJneighbourlists, self.sigmas, self.epsilons, r_cut, r_skin)
 
     def make_positions_list(self): # update positions list based on position registered to each particle in particles
-        self.positions = [] 
-        for particle in self.particles:
-            self.positions.append(particle.position)
+        self.positions = np.ones((len(self.particles), self.dimension))
+        for i in range(len(self.particles)):
+            self.positions[i] = self.particles[i].position
 
     def update_particle_positions(self): # update registered position for each particle based on positions list
         for i in range(len(self.particles)):

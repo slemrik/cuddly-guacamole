@@ -40,7 +40,7 @@ boxsize = np.ones(dim)*(r_cut_LJ + r_skin_LJ)*1.2 # size of our system box
 ############################################################################################################
 
 
-input.inputgenerator.gen_random_input_3D(filename = "input/testinput.csv", n_particles = 30, 
+input.inputgenerator.gen_random_input_3D(filename = "input/testinput.csv", n_particles = 512, 
                                             boxsize = boxsize, r_c = r_cut_LJ + r_skin_LJ)
 
 sysconfig = []

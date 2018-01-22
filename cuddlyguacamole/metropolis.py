@@ -9,13 +9,13 @@ import warnings
 import pbc
 import numba as nb
 
-# @nb.jit(nb.typeof([np.zeros(1)], True, np.random.randn(1), 1.0))
+# @nb.jit(nb.typeof(np.zeros((1, 1)), True, np.random.randn((1,1)), 1.0))
 def mcmc_step(box, width, r_cut, r_skin, update_nblist):
 
     # kb = 1.38064852*10**(-13) # N*Å/K (Boltzmann constant)
 
-    positions_trial = [np.zeros(box.dimension) for i in range(len(box.positions))]
-    trial_step = width * np.random.randn(*np.asarray(positions_trial).shape)/4 #randn -> std norm. dist, divide by 4 to keep results mostly within (-0.5, 0.5)
+    positions_trial = np.zeros((len(box.particles), box.dimension))
+    trial_step = width * np.random.randn(*positions_trial.shape)/4 #randn -> std norm. dist, divide by 4 to keep results mostly within (-0.5, 0.5)
 
     for i in range(len(positions_trial)):
         positions_trial[i] = pbc.enforce_pbc(box.positions[i] + trial_step[i], box.size) 
@@ -23,12 +23,11 @@ def mcmc_step(box, width, r_cut, r_skin, update_nblist):
     particles_trial = [system.Particle(positions_trial[i], box.particles[i].charge, 
                                         box.particles[i].sigmaLJ, box.particles[i].epsilonLJ) for i in range(len(box.particles))] # set trial particle list with trial positions
     if update_nblist:
-        particles_trial = neighbourlist.verlet_neighbourlist(particles_trial, r_cut, r_skin) # update neighbourlist for trial positions 
+        nblist_trial = neighbourlist.verlet_neighbourlist(positions_trial, r_cut, r_skin) # update neighbourlist for trial positions 
     else:
-        for i in range(len(particles_trial)):
-            particles_trial[i].neighbourlist = box.particles[i].neighbourlist 
+        nblist_trial = box.LJneighbourlists
 
-    LJpotential_trial = lennardjones.LJ_potential(particles_trial, r_cut, r_skin)
+    LJpotential_trial = lennardjones.LJ_potential(positions_trial, nblist_trial, box.sigmas, box.epsilons, r_cut, r_skin)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
