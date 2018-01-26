@@ -71,7 +71,6 @@ ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 ############################################################################################################
 
 save_system_history = True
-# ourbox, pos_history, pot_history, p_acc_vec = metropolis.mcmc(ourbox, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
 ourbox.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
 
 # print(ourbox.LJpotential)
@@ -126,7 +125,7 @@ print(xyz)
 print(edges)
 print(angles)
 
-# plt.show()
+plt.show()
 
 
 

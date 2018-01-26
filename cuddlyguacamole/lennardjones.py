@@ -31,8 +31,9 @@ def LJ_potential(positions, LJneighbourlists, sigmas, epsilons, r_c, r_s):
     '''
 
 
-    # if LJneighbourlists is None:
-    #     raise Exception('compute LJneighbourlists for particles before computing LJ potential!')
+    if LJneighbourlists is None:
+        # raise Exception('compute LJneighbourlists for particles before computing LJ potential!')
+        return None
 
     r_cut = r_c + r_s
 
@@ -41,12 +42,12 @@ def LJ_potential(positions, LJneighbourlists, sigmas, epsilons, r_c, r_s):
         k = 0
         j = LJneighbourlists[i][k]  #NB LJneigbourlists[i] contains only the neighbours of particle i with indices j>i. 
                                     # Thus interactions are NOT counted twice by computing in this manner.
-        while j!=-1:
-            r = np.linalg.norm(positions[i] - positions[j])
+        while j!=-1: # -1 means no more neighbours in list
+            r = np.linalg.norm(positions[j] - positions[i])
             LJpot += LJ_potential_ij(r, sigmas[i], epsilons[i], sigmas[j], epsilons[j], r_cut)
             k += 1
             j = LJneighbourlists[i][k]
-            
+
     return LJpot
 
 

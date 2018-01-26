@@ -1,7 +1,7 @@
-def enforce_pbc(r_vec, boxsize):
+def enforce_pbc(position, boxsize):
     for i, length in enumerate(boxsize):
-        while r_vec[i] >= 0.5 * length:
-            r_vec[i] -= length
-        while r_vec[i] < -0.5 * length:
-            r_vec[i] += length
-    return r_vec
+        while position[i] > length:
+            position[i] -= 2*length
+        while position[i] <= -length:
+            position[i] += 2*length
+    return position
