@@ -48,6 +48,7 @@ def mcmc_step(box, width, r_cut, r_skin, update_nblist):
     return box.positions, False, trial_step, acceptance_prob # return False for rejected trial step (no need to update box object)
 
 
+
 def mcmc(box, n_steps, width, n_skip, n_reuse_nblist, 
             save_system_history, r_cut_LJ, r_skin_LJ):
     '''Metropolis MCMC simulation of the movement of the particles within *box*.
