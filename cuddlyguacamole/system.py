@@ -119,13 +119,13 @@ class Box(object):
         # positions_tmp[0] = 1e15*np.ones(self.dimension) # give positions_tmp[0] some large arbitrary value to pass the first while check
         # while np.linalg.norm(np.asarray(self.positions) - np.asarray(positions_tmp)) > tol_opt and i < n_opt:
         LJpotential_old = 1e16
-        while np.abs((self.LJpotential - LJpotential_old)/self.LJpotential) > tol_opt and i < n_opt:
+        while i < n_opt: #and np.abs((self.LJpotential - LJpotential_old)/self.LJpotential) > tol_opt:
             # positions_tmp = self.positions
             LJpotential_old = self.LJpotential
             self.temp = temperatures[i]
             self.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
             
-            print(np.abs((self.LJpotential - LJpotential_old)/self.LJpotential))
+            # print(np.abs((self.LJpotential - LJpotential_old)/self.LJpotential))
             i += 1
             self.optimisation_pos_history.append(list(self.pos_history)) # store all position histories
             self.optimisation_pot_history.append(list(self.pot_history))

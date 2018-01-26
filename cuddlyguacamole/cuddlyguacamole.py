@@ -40,7 +40,7 @@ boxsize = np.ones(dim)*(r_cut_LJ + r_skin_LJ)*1.2 # size of our system box
 ############################################################################################################
 
 
-input.inputgenerator.gen_random_input_3D(filename = "input/testinput.csv", n_particles = 512, 
+input.inputgenerator.gen_random_input_3D(filename = "input/testinput.csv", n_particles = 64, 
                                             boxsize = boxsize, r_c = r_cut_LJ + r_skin_LJ)
 
 sysconfig = []
@@ -73,7 +73,7 @@ ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 ############################################################################################################
 
 save_system_history = True
-n_opt = 50
+n_opt = 20
 # tol_opt = ourbox.size[0]/100
 tol_opt = 1/50
 ourbox.optimize(n_opt, tol_opt, 5*int(n_steps/n_opt), n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
