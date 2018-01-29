@@ -17,17 +17,17 @@ start = time.time()
 # System and simulation setup:
 ############################################################################################################
 
-kb = 1.38064852*10**(-13) # N*Å/K (Boltzmann constant)
+kb = 1.38064852*10**(-23) # N*m/K (Boltzmann constant)
 # xenon & argon: http://pbx-brasil.com/outrasDisciplinas/DinMol/Notas/IIarea/aula203/papers/PhysRev.159.98.pdf
-sigma_argon = 3.405 # Å
-epsilon_argon = 119.8 # actually epsilon/kb (K) <- thus potential is actually potential/kb
+sigma_argon = 3.405 * 10**(-10) # m
+epsilon_argon = 119.8*kb # actually epsilon/kb (K) <- thus potential is actually potential/kb (????????)
 # sigma_xenon = 4.07 # Å
 # epsilon_xenon = 225.3 # actually epsilon/kb (K) <- thus potential is actually potential/kb
 
 dim = 3 # spatial dimension of system
 
 r_cut_LJ = 2.5*sigma_argon # cut-off radius for LJ potential computation
-n_steps = 600 # no. of steps to simulate
+n_steps = 1000 # no. of steps to simulate
 n_reuse_nblist = int(n_steps/50) # update the neighbourlist for each particle only every n_reuse_nblist steps
 n_skip = int(n_steps/200) # only save the system history every n_skip steps
 width = r_cut_LJ / (n_reuse_nblist*20)
@@ -64,7 +64,7 @@ for i in range(len(sysconfig)):
     particles.append(system.Particle(position = np.asarray(sysconfig[i][0:3]), 
         charge = sysconfig[i][3], sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon))
 
-ourbox = system.Box(dimension = dim, size = boxsize, particles = particles, temp = 120.0)
+ourbox = system.Box(dimension = dim, size = boxsize, particles = particles, temp = 120.0, kb = kb)
 ourbox.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
 ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 
@@ -79,7 +79,7 @@ tol_opt = 1/50
 ourbox.optimize(n_opt, tol_opt, 5*int(n_steps/n_opt), n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
 ourbox.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
 pos_history = ourbox.pos_history
-pot_history = kb*10**10*np.asarray(ourbox.pot_history) #kb*10**10 to get potential in Joule
+pot_history = np.asarray(ourbox.pot_history) #kb*10**10 to get potential in Joule (?)
 pot_increases = 0
 pot_decreases = 0
 for i, pot in enumerate(pot_history[1:]):
@@ -99,7 +99,7 @@ for i, pot in enumerate(pot_history[1:]):
 entire_pot_history = []
 for pot_history_opt_round_i in ourbox.optimisation_pot_history:
     for pot_step_j_opt_round_i in pot_history_opt_round_i[0:-1]:
-        entire_pot_history.append(kb*10**10*pot_step_j_opt_round_i)
+        entire_pot_history.append(pot_step_j_opt_round_i)
 
 entire_pot_history = np.asarray(entire_pot_history)
 

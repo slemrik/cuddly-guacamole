@@ -52,7 +52,7 @@ class Box(object):
         r_skin_LJ (float): size of skin region for LJ potential calculation 
     """
 
-    def __init__(self, dimension, size, particles, temp, optimisation_pos_history=[], optimisation_pot_history = []):
+    def __init__(self, dimension, size, particles, temp, optimisation_pos_history=[], optimisation_pot_history = [], kb = 1.38064852*10**(-23)):
         """Return a Box object of dimension *dimension* (between 1 and 3),
         whose length(&breadth&height) is *size*, is centered at *center*, 
         and contains the particles in the numpy array *particles*"""
@@ -63,6 +63,7 @@ class Box(object):
         self.particles = particles
         self.LJpotential = None
         self.temp = temp
+        self.kb = kb # the unit that kb is given in defines the units used by the system. If units of kb is in N*Å/K, then energy is in N*Å. 
 
         self.LJneighbourlists = None
         self.sigmas = np.zeros(len(particles))
@@ -90,9 +91,9 @@ class Box(object):
     def make_positions_list(self): # update positions list based on position registered to each particle in particles
         self.positions = np.ones((len(self.particles), self.dimension))
         for i in range(len(self.particles)):
-            self.positions[i] = self.particles[i].position
+            self.positions[i] = self.particles[i].position # necessary to update box.positions and particle.position indidivually? or do they point to the same location in memory anyway by this assignment?
 
-    def update_particle_positions(self): # update registered position for each particle based on positions list
+    def update_particle_positions(self): # update registered position for each particle based on positions list (?)
         for i in range(len(self.particles)):
             self.particles[i].position = self.positions[i]
 
@@ -104,12 +105,12 @@ class Box(object):
         self.Cpotential = 0
 
     def simulate(self, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co = 0, r_skin_Co = 0):
-        self.positions, self.LJpotential, self.pos_history, self.pot_history, _ = metropolis.mcmc(self, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
+        self.positions, self.LJpotential, self.pos_history, self.pot_history, _ = metropolis.mcmc(self, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ, self.kb)
         self.update_particle_positions()
         self.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
 
-    def optimize(self, n_opt, tol_opt, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co = 0, r_skin_Co = 0):
-        original_temp = self.temp # store original box temperature
+    def optimize(self, n_opt, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co = 0, r_skin_Co = 0):
+        original_temp = float(self.temp) # store original box temperature
 
         temp_decrease_factors = 1.0/(np.ones(n_opt)*range(1, n_opt+1)) # reduce temperature on each simulation i by temp_decrease_factors[i]
         temperatures = self.temp * np.ones(n_opt) * temp_decrease_factors
@@ -118,20 +119,20 @@ class Box(object):
         # positions_tmp = [np.ones(self.dimension) for x in range(len(self.positions))]
         # positions_tmp[0] = 1e15*np.ones(self.dimension) # give positions_tmp[0] some large arbitrary value to pass the first while check
         # while np.linalg.norm(np.asarray(self.positions) - np.asarray(positions_tmp)) > tol_opt and i < n_opt:
-        LJpotential_old = 1e16
+        # LJpotential_old = 1e16
         while i < n_opt: #and np.abs((self.LJpotential - LJpotential_old)/self.LJpotential) > tol_opt:
             # positions_tmp = self.positions
             LJpotential_old = self.LJpotential
             self.temp = temperatures[i]
-            self.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
-            
-            # print(np.abs((self.LJpotential - LJpotential_old)/self.LJpotential))
+            self.simulate(int(n_steps/n_opt)*50, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
+            # print("new potential = ", self.LJpotential)
+            # print("change = ", self.LJpotential - LJpotential_old)
+            # print("rel.change =", (self.LJpotential - LJpotential_old)/self.LJpotential, "\n -------")
             i += 1
             self.optimisation_pos_history.append(list(self.pos_history)) # store all position histories
             self.optimisation_pot_history.append(list(self.pot_history))
 
-        self.temp = original_temp # reset temperature
-        
+        self.temp = original_temp # reset temperature        
         
 
 
