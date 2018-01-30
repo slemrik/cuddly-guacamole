@@ -7,8 +7,16 @@ from numpy.linalg import norm
 from scipy.special import erfc
 from scipy import exp, pi
 
+"""
+    i : potential location
+    r : list of radii
+    q : list of charges
+    alpha : Ewald parameter
+    cutoff_rspace : real space box cutoff
+    cutoff_kspace : Fourier space box cutoff
+ """
 
-def energy(position,  q, cell, .......):
+def energy(i, r, q, cell, cutoff_rspace, cutoff_kspace):
 
     Energy_short  = short_energy(i, r, q, cell, cutoff_rspace)
     Energy_long   = long_energy(i, r, q, cutoff_kspace,)
@@ -18,8 +26,14 @@ def energy(position,  q, cell, .......):
 
 
 
+def potential(i, r, q, cell, area, invcell, alpha, cutoff_rspace, cutoff_kspace):
 
-def self_potential ##
+    Vr = short_energy_sum(i, r, q, cell, alpha, cuttoff_rspace)
+    Vf = total_long_energy(i, ,r, q, invcell, alpha, cutoff_kpsace, area)
+    Vs = total_s_energy(i, r, q, cell, alpha)
+    
+    return Vr+Vf+Vs
+
 
 #energy calculation formula. with reference to equation 39 in page 7 of the pdf(link found in first line of this file). 
 def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
