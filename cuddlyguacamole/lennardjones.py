@@ -1,53 +1,33 @@
 import numpy as np
-import neighbourlist
-import system
-import numba as nb
 
-@nb.jit(nopython = True)
-def LJ_potential_ij(r, sigmaii, epsilonii, sigmajj, epsilonjj, r_cut):
-    
-    sigmaij = 0.5 * (sigmaii + sigmajj) # Lorentz-Berthelot: https://en.wikipedia.org/wiki/Combining_rules
-    epsilonij = np.sqrt(epsilonii * epsilonjj)
+def LJ_potential_ij(r, r_cut, sigma1=1, epsilon1=1, sigma2=1, epsilon2=1):
+    sigma12 = (sigma1 + sigma2)/2
+    epsilon12 = np.sqrt(epsilon1 * epsilon2)
 
-    q = (sigmaij / r)**6
-    q_c = (sigmaij/r_cut)**6
-    LJ_pot_ij = (4.0 * epsilonij * q * (q - 1.0)      # return lennard jones interaction energy between particle i and particle j
-               - 4.0 * epsilonij * q_c *(q_c - 1.0))  # subtract value of potential at r_cut to avoid discontinuity # precompute!!!!!!
-    return LJ_pot_ij
+    if r >= r_cut:
+        return 0.0 #not sure in this part, because neighbourlist
 
+    q = (sigma12 / r)**6
+    q_cut = (sigma12 / r_cut)**6
 
-@nb.jit(nopython = True)
-def LJ_potential(positions, LJneighbourlists, sigmas, epsilons, r_c, r_s):    
-    '''Computes the total Lennard Jones potential of the system configuration of *box*.
-    
-    arguments:
-        positions (numpy array): list of 3d numpy arrays of positions for each particle. 
-        LJneighbourlists (numpy array): list of numpy arrays of integers of various sizes. LJneighbourlists[i] gives
-        the indices of all particles that are in the neighbourlist of particle i in our system
-        sigmas (numpy array of float): sigma for each particle
-        epsilons (numpy array of float): epsilon for each particle  
-        r_c (float): cutoff radius for LJ potential
-        r_s (float): size of skin region for LJ potential
-    '''
+    return (4.0 * epsilon12 * q * (q-1))
+    # return (4.0 * epsilon12 * q * (q-1)) - (4.0 * epsilon12 * q_cut *(q_cut - 1.0))
 
+def LJ_potential(positions, neighbour_list, r_cut=2.5, sigmas=1, epsilons=1):
+    index_of_number_of_neighoburs = 0
+    i = 0
+    potential = 0
 
-    if LJneighbourlists is None:
-        # raise Exception('compute LJneighbourlists for particles before computing LJ potential!')
-        return None
+    while index_of_number_of_neighoburs < len(neighbour_list):
+        number_of_neighoburs = neighbour_list[index_of_number_of_neighoburs]
 
-    r_cut = r_c + r_s
+        for j in range(1, number_of_neighoburs+1):
+            index_of_neighbour = neighbour_list[index_of_number_of_neighoburs + j]
+            
+            r = np.linalg.norm(positions[index_of_neighbour] - positions[i])
+            potential += LJ_potential_ij(r, r_cut)
 
-    LJpot = 0.0
-    for i in range(len(positions)):
-        k = 0
-        j = LJneighbourlists[i][k]  #NB LJneigbourlists[i] contains only the neighbours of particle i with indices j>i. 
-                                    # Thus interactions are NOT counted twice by computing in this manner.
-        while j!=-1: # -1 means no more neighbours in list
-            r = np.linalg.norm(positions[j] - positions[i])
-            LJpot += LJ_potential_ij(r, sigmas[i], epsilons[i], sigmas[j], epsilons[j], r_cut)
-            k += 1
-            j = LJneighbourlists[i][k]
+        index_of_number_of_neighoburs += number_of_neighoburs + 1
+        i += 1
 
-    return LJpot
-
-
+    return potential

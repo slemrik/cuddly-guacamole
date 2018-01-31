@@ -86,7 +86,7 @@ class Box(object):
         self.LJneighbourlists = neighbourlist.verlet_neighbourlist(self.positions, r_cut, r_skin)
 
     def compute_LJ_potential(self, r_cut, r_skin):
-        self.LJpotential = lennardjones.LJ_potential(self.positions, self.LJneighbourlists, self.sigmas, self.epsilons, r_cut, r_skin)
+        self.LJpotential = lennardjones.LJ_potential(self.positions, self.LJneighbourlists, r_cut, self.sigmas, self.epsilons)
 
     def make_positions_list(self): # update positions list based on position registered to each particle in particles
         self.positions = np.ones((len(self.particles), self.dimension))
@@ -125,7 +125,7 @@ class Box(object):
             LJpotential_old = self.LJpotential
             self.temp = temperatures[i]
             self.simulate(int(n_steps/n_opt)*50, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
-            # print("new potential = ", self.LJpotential)
+            print("new potential = ", self.LJpotential)
             # print("change = ", self.LJpotential - LJpotential_old)
             # print("rel.change =", (self.LJpotential - LJpotential_old)/self.LJpotential, "\n -------")
             i += 1

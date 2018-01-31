@@ -1,39 +1,21 @@
 import numpy as np
-import system
-import numba as nb
-from numba import cuda
-from numba import vectorize 
 
-# @vectorize(['float32(float32, float32, float32)'], target = 'cuda')
-@nb.jit#(nopython = True)
 def verlet_neighbourlist(positions, r_cut, r_skin):
-    """Verlet neighbourlist computation: for each of the particles in the array *box.particles*,
-    we compute a neighbourlist of particles that lie within a cutoff radius r_cut+r_skin. 
-    Returns an updated list of numpy arrays neighbourlists where each array contains the neighbourlist for that particle.
+    neighbor_list = []
+    start_of_neighbours = 0
 
-    arguments:
-        positions (nparticles x dimension numpy array of float: lists pos of particles in system
-        r_cut: verlet cutoff radius
-        r_skin: size of verlet skin region
-    """
-    N = len(positions)
-    r_cutt = r_cut + r_skin
-    neighbourlists = np.full((N, N), -1)  # initialise entries of nblist array i to 0. 
-                                                                                # The indices of the actual neighbours of particle i
-                                                                                # will be in the beginning of the array, before the -1's
-    for i in range(N):
-        k = 0 # counts no. of entries in  nblist of particle i
-        for j in range(i+1, N): # NB: by only considering positions[i+1:] only particle j will 
-                                                        # appear in the nblist of particle i but particle i will not 
-                                                        # appear in the nblist of j... thus the neighbourlist is not always a 
-                                                        # true neighbourlist for each individual particle. But it does record of 
-                                                        # each pair of neighbours in any case 
-            # print(i, positions[i])
-            # print(j, positions[j])
-            # print(np.linalg.norm(positions[i] - positions[j]))
-            if np.linalg.norm(positions[i] - positions[j]) < r_cutt:
-                neighbourlists[i][k] =  j
-                k += 1
+    for i in range(0, len(positions)):
+        n_neighbours_of_i = 0
+        neighbor_list.append(0) 
 
-    return neighbourlists
+        for j in range(i+1, len(positions)):
+            d = np.linalg.norm(positions[j]-positions[i])
 
+            if not np.array_equal(i,j) and d <= r_cut + r_skin:
+                n_neighbours_of_i += 1
+                neighbor_list.append(j) #j is the index of particle at positions
+        neighbor_list[start_of_neighbours] = n_neighbours_of_i
+        start_of_neighbours = len(neighbor_list)
+
+    return neighbor_list
+    

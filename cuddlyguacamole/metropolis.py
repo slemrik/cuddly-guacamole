@@ -24,7 +24,7 @@ def mcmc_step(box, width, r_cut, r_skin, update_nblist, kb = 1.38064852*10**(-23
     else:
         nblist_trial = np.array(box.LJneighbourlists)
 
-    LJpotential_trial = lennardjones.LJ_potential(positions_trial, nblist_trial, box.sigmas, box.epsilons, r_cut, r_skin)
+    LJpotential_trial = lennardjones.LJ_potential(positions_trial, nblist_trial, r_cut, box.sigmas, box.epsilons)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
