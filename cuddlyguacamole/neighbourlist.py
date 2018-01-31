@@ -1,6 +1,6 @@
 import numpy as np
 
-def verlet_neighbourlist(positions, r_cut, r_skin):
+def create_verlet_list(positions, r_cut, r_skin):
     neighbor_list = []
     start_of_neighbours = 0
 
@@ -16,6 +16,4 @@ def verlet_neighbourlist(positions, r_cut, r_skin):
                 neighbor_list.append(j) #j is the index of particle at positions
         neighbor_list[start_of_neighbours] = n_neighbours_of_i
         start_of_neighbours = len(neighbor_list)
-
     return neighbor_list
-    
