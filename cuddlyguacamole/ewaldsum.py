@@ -39,14 +39,28 @@ def potential(i, r, q, cell, area, invcell, alpha, cutoff_rspace, cutoff_kspace)
 
 
 #energy calculation formula. with reference to equation 39 in page 7 of the pdf(link found in first line of this file). 
-def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
-    
-    for j in range(0, len(q)):
-        
-   
-        
-        
-    return Vr
+def short_energy_sum (coords1, charges1, coords2, charges2, rcut, alpha, box):
+ eps =  8.854187817 * 10 ** (-12)6	
+ 	n = coords1.shape[0]#not final
+ 	m = coords2.shape[0]#not final
+ 	r_max = int(np.ceil(2.0 * rcut / np.min(box)))
+
+ 	for i in range(n):
+ 		q_i = charges1[i] #need to change to different system
+ 		r_i = coords1[i]
+
+ 		for j in range [m]
+ 			q_j = charges2[j]
+ 			r_j = coords[j]
+
+ 			for r_i in range (-r_max, r_max + 1):
+ 				for r_j in range (-r_max,r_max + 1):
+ 					for r_k in range (-r_max, r_max + 1):
+ 						r_j_n = r_j + np.array([r_i, r_j, r_k]) * box
+ 						r_ij = _dist(r_i, r_j_n)
+ 						if r_ij < 1e-10 or r_ij > r_c:
+ 							continue
+ 						short_energy_sum = 1/(8 * pi * eps)....alpha = 1/(sqrt(2pi)*sigma)#not finished yet, need to add signma as a constant
 
 
 def total_long_energy (i, r, q, cutoff_kspace):
