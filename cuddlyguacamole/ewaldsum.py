@@ -16,6 +16,9 @@ from scipy import exp, pi
     cutoff_kspace : Fourier space box cutoff
  """
 
+#Constants
+eps =  8.854187817 * 10 ** (-12)
+
 def energy(i, r, q, cell, cutoff_rspace, cutoff_kspace):
 
     Energy_short  = short_energy(i, r, q, cell, cutoff_rspace)
