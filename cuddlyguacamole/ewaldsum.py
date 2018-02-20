@@ -60,7 +60,7 @@ def short_energy_sum (coords1, charges1, coords2, charges2, rcut, alpha, box):
  						r_ij = _dist(r_i, r_j_n)
  						if r_ij < 1e-10 or r_ij > r_c:
  							continue
- 						short_energy_sum = 1/(8 * pi * eps)....alpha = 1/(sqrt(2pi)*sigma)#not finished yet, need to add signma as a constant
+ 						short_energy_sum = 1/(8 * pi * eps)....alpha = 1/(sqrt(2*pi)*sigma)#not finished yet, need to add signma as a constant
 
 
 def total_long_energy (i, r, q, cutoff_kspace):
