@@ -1,6 +1,7 @@
 import numpy as np
 import neighbourlist
 import system
+import pbc
 import numba as nb
 
 @nb.jit(nopython = True)
@@ -17,7 +18,7 @@ def LJ_potential_ij(r, sigmaii, epsilonii, sigmajj, epsilonjj, r_cut):
 
 
 @nb.jit(nopython = True)
-def LJ_potential(positions, LJneighbourlists, sigmas, epsilons, r_c, r_s):    
+def LJ_potential(positions, LJneighbourlists, sigmas, epsilons, r_c, r_s, boxsize):    
     '''Computes the total Lennard Jones potential of the system configuration of *box*.
     
     arguments:
@@ -43,7 +44,9 @@ def LJ_potential(positions, LJneighbourlists, sigmas, epsilons, r_c, r_s):
         j = LJneighbourlists[i][k]  #NB LJneigbourlists[i] contains only the neighbours of particle i with indices j>i. 
                                     # Thus interactions are NOT counted twice by computing in this manner.
         while j!=-1: # -1 means no more neighbours in list
-            r = np.linalg.norm(positions[j] - positions[i])
+            r = np.linalg.norm(pbc.enforce_pbc_distance(positions[j] - positions[i], boxsize))
+            # print(i,j)
+            # print(positions[j],positions[i])
             LJpot += LJ_potential_ij(r, sigmas[i], epsilons[i], sigmas[j], epsilons[j], r_cut)
             k += 1
             j = LJneighbourlists[i][k]
