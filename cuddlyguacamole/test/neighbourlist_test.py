@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-import neighbourlist
+from  cuddlyguacamole import neighbourlist
 import numpy.testing as npt
 
 positions = np.array([[ 2.90956646, 2.15152179, 3.65165442],[ 3.68121774, 0.18314957, 3.73834638],[ 1.14410085, 4.85833454, 2.95269129],[ 0.78264966, 3.65091237, 1.03486635]])

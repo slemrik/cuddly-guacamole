@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
-import lennardjones
-import neighbourlist
+from  cuddlyguacamole import lennardjones
+from  cuddlyguacamole import neighbourlist
 import numpy.testing as npt
 
 r_cut = 2.5
