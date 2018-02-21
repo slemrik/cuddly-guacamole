@@ -1,10 +1,15 @@
 import load
 import system
 
-def optimize(filename):
+temp = 120 #these could be somwhere more general place
+dim = 3
+
+def optimize(filename='sodium-chloride-example.npz'):
     print('optimizer')
-    parameters, positions, types = load.load_input_file(filename)
-    create_particle_object(parameters, positions, types)
+    parameters, positions, types, boxsize = load.load_input_file(filename)
+    particles = create_particle_object(parameters, positions, types)
+    box = system.Box(dim, boxsize, particles, temp)
+    return box
 
 def create_particle_object(parameters, positions, types):
     particles = []
@@ -17,4 +22,6 @@ def create_particle_object(parameters, positions, types):
 
         particles.append(system.Particle(position, charge, sigmaLJ, epsilonLJ))
 
-optimize('sodium-chloride-example.npz')
+    return particles
+
+# optimize('sodium-chloride-example.npz')

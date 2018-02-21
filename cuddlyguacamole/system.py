@@ -46,7 +46,7 @@ class Box(object):
         r_skin_LJ (float): size of skin region for LJ potential calculation 
     """
 
-    def __init__(self, dimension, size, particles, temp, optimisation_pos_history=[], optimisation_pot_history = [], kb = 1.38064852*10**(-23)):
+    def __init__(self, dimension, size, particles, temp, kb = 0.008314462175, optimisation_pos_history=[], optimisation_pot_history = []):
         self.dimension = dimension
         self.size = size
         self.particles = particles

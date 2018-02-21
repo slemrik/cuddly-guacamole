@@ -16,7 +16,7 @@ def load_input_file(filename):
 
 	    parameters = fh['parameters'].item()
 
-	return parameters, positions, types
+	return parameters, positions, types, box
 
 # load_input_file('sodium-chloride-example.npz')
 #remove this later, it will come from function call
