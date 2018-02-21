@@ -1,7 +1,6 @@
 import numpy as np
 import csv
 import system
-import input.inputgenerator
 import metropolis
 import neighbourlist
 import lennardjones
