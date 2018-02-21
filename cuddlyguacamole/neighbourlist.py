@@ -1,12 +1,13 @@
 import numpy as np
 import system
 import numba as nb
+import pbc
 from numba import cuda
 from numba import vectorize 
 
 # @vectorize(['float32(float32, float32, float32)'], target = 'cuda')
 @nb.jit#(nopython = True)
-def verlet_neighbourlist(positions, r_cut, r_skin):
+def verlet_neighbourlist(positions, r_cut, r_skin, boxsize):
     """Verlet neighbourlist computation: for each of the particles in the array *box.particles*,
     we compute a neighbourlist of particles that lie within a cutoff radius r_cut+r_skin. 
     Returns an updated list of numpy arrays neighbourlists where each array contains the neighbourlist for that particle.
@@ -31,7 +32,7 @@ def verlet_neighbourlist(positions, r_cut, r_skin):
             # print(i, positions[i])
             # print(j, positions[j])
             # print(np.linalg.norm(positions[i] - positions[j]))
-            if np.linalg.norm(positions[i] - positions[j]) < r_cutt:
+            if np.linalg.norm(pbc.enforce_pbc_distance(positions[i] - positions[j], boxsize)) < r_cutt:
                 neighbourlists[i][k] =  j
                 k += 1
 
