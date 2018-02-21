@@ -2,8 +2,7 @@ import numpy as np
 import system
 
 def load_input_file(filename):
-	#load the data
-	#file name:sodium-chloride-example.npz
+
 	with np.load(filename) as fh:
 	    print (fh.keys())
 
@@ -16,5 +15,10 @@ def load_input_file(filename):
 	    types = fh['types']
 
 	    parameters = fh['parameters'].item()
+
+	return parameters, positions, types
+
+# load_input_file('sodium-chloride-example.npz')
+#remove this later, it will come from function call
 
 

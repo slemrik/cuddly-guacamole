@@ -1,12 +1,20 @@
 import load
+import system
 
-filename = 'sodium-chloride-example.npz'
-start = time.time()
-
-def optimize():
+def optimize(filename):
     print('optimizer')
-    load_input_file()
+    parameters, positions, types = load.load_input_file(filename)
+    create_particle_object(parameters, positions, types)
 
-def load_input_file():
-    load.load_input_file(filename)
-    print('loaded')
+def create_particle_object(parameters, positions, types):
+    particles = []
+
+    for i in range(len(types)):
+        position = positions[i]
+        sigmaLJ = parameters[types[i]][0]
+        epsilonLJ = parameters[types[i]][1]
+        charge = parameters[types[i]][3]
+
+        particles.append(system.Particle(position, charge, sigmaLJ, epsilonLJ))
+
+optimize('sodium-chloride-example.npz')
