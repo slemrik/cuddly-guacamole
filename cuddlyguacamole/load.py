@@ -26,6 +26,11 @@ print("The box length is:", box)
 #Positions index: each particle's position in [[x1,y1,z1],[x2,y2,z2]...]
 #print(positions)
 
+#generate charges array
+q = np.ones(len(positions))
+for i in range(0,len(positions)):
+	if types[i] == 'Cl-':
+		q[i] = -1
 
 
 
