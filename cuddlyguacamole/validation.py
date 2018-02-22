@@ -44,9 +44,9 @@ n_particles = 64
 # Generate input system configuration:
 ############################################################################################################
 
-ourbox = test.generate_test_system.generate_test_system(dim, boxsize, n_particles, temperature, 0, sigma_argon, epsilon_argon, kb = kb)
+our_box = test.generate_test_system.generate_test_system(dim, boxsize, n_particles, temperature, 0, sigma_argon, epsilon_argon, kb = kb)
 
-# x = np.array(ourbox.positions)
+# x = np.array(our_system.positions)
 # y = np.ascontiguousarray(x).view(np.dtype((np.void, x.dtype.itemsize * x.shape[1])))
 # _, idx = np.unique(y, return_index=True)
 # unique_result = x[idx]
@@ -54,8 +54,8 @@ ourbox = test.generate_test_system.generate_test_system(dim, boxsize, n_particle
 # print(len(unique_result))
 # print(len(x))
 
-ourbox.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
-ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
+# our_system.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
+# our_system.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 
 # input.inputgenerator.gen_random_input_3D(filename = "input/testinput.csv", n_particles = n_particles, 
 #                                             boxsize = boxsize, r_c = r_cut_LJ + r_skin_LJ)
@@ -71,7 +71,7 @@ ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 #     sysconfig[i][0:3] = pbc.enforce_pbc(sysconfig[i][0:3]*boxsize, boxsize)
 
 # ############################################################################################################
-# # Initialise particle list based on input and the system (ourbox):
+# # Initialise particle list based on input and the system (our_system):
 # ############################################################################################################
 
 # particles = []
@@ -80,9 +80,9 @@ ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 #     particles.append(system.Particle(position = np.asarray(sysconfig[i][0:3]), 
 #         charge = sysconfig[i][3], sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon))
 
-# ourbox = system.Box(dimension = dim, size = boxsize, particles = particles, temp = temperature, kb = kb)
-# ourbox.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
-# ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
+# our_system = system.Box(dimension = dim, size = boxsize, particles = particles, temp = temperature, kb = kb)
+# our_system.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
+# our_system.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 
 ############################################################################################################
 # Simulate system configuration evolution:
@@ -90,14 +90,24 @@ ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 
 save_system_history = True
 n_opt_max = 30
-# tol_opt = ourbox.size[0]/100
+# tol_opt = our_system.size[0]/100
 tol_opt = 1/100
-# ourbox.optimize(n_opt, tol_opt, 20*int(n_steps_opt/n_opt), n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
-ourbox.optimize(n_opt_max, n_steps_opt, tol_opt, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
-ourbox.simulate(n_steps_sim, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
-pos_history = ourbox.pos_history
-# pot_history = kb*10**10*np.asarray(ourbox.pot_history) #kb*10**10 to get potential in Joule
-pot_history = np.asarray(ourbox.pot_history) #kb*10**10 to get potential in Joule
+# our_system.optimize(n_opt, tol_opt, 20*int(n_steps_opt/n_opt), n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
+
+
+our_system = system.System(our_box)
+our_system.simulate()
+our_system.optimize()
+
+# our_system.optimize()
+# our_system.simulate()
+
+# our_system.optimize(n_opt_max, n_steps_opt, tol_opt, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
+
+# our_system.simulate(n_steps_sim, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
+pos_history = our_system.pos_history
+# pot_history = kb*10**10*np.asarray(our_system.pot_history) #kb*10**10 to get potential in Joule
+pot_history = np.asarray(our_system.pot_history) #kb*10**10 to get potential in Joule
 # pot_increases = 0
 # pot_decreases = 0
 # for i, pot in enumerate(pot_history[1:]):
@@ -115,7 +125,7 @@ pot_history = np.asarray(ourbox.pot_history) #kb*10**10 to get potential in Joul
 # print(pot_decreases)
 
 entire_pot_history = []
-for pot_history_opt_round_i in ourbox.optimisation_pot_history:
+for pot_history_opt_round_i in our_system.optimisation_pot_history:
     for pot_step_j_opt_round_i in pot_history_opt_round_i[0:-1]:
         #entire_pot_history.append(kb*10**10*pot_step_j_opt_round_i)
         entire_pot_history.append(pot_step_j_opt_round_i)

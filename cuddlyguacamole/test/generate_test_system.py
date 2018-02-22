@@ -24,8 +24,8 @@ def generate_test_system(dim = 3, boxsize = 5*np.ones(3), nparticles = 64, temp 
 
     particles = []
     for i in range(nparticles):
-        particles.append(system.Particle(position = positions[i], charge = charge, sigmaLJ = sigma, epsilonLJ = epsilon))
+        particles.append(system.Particle(positions[i], charge, sigma, epsilon))
 
-    testbox = system.Box(dimension = dim, size = boxsize, particles = particles, temp = temp, kb = kb)
+    testbox = system.Box(boxsize, particles)
 
     return testbox
