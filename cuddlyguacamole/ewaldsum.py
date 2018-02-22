@@ -13,7 +13,7 @@ epsilon = 8.854187817e-12
 
 @nb.jit(nopython = True)
 def Ewald_short_energy_ij(r_ij,qi,qj,r_c):
-    alpha = 1/(2**(1/2))/sigma(r_c)
+    alpha = 1/(2**(1/2))/sigma(r_c,p)
     Ewald_energy_ij = qi*qj*1/(8*math.pi*epsilon) * math.erfc(alpha*r_ij)/r_ij
     
     return Ewald_energy_ij
