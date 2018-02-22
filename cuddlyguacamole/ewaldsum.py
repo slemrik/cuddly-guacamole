@@ -7,14 +7,13 @@ import numba as nb
 from numba import cuda
 from numba import vectorize 
 
-p = 10 #accuracy set to 1e-6 gives p??????
+p = 10 #accuracy
 epsilon = 8.854187817e-12
 #https://en.wikipedia.org/wiki/Vacuum_permittivity
 
 #Computes the total Ewald_short_energy for single step.
 @nb.jit(nopython = True)
 def Ewald_short_energy_ij(r_ij,qi,qj,r_cut):
-    
     '''
     arguments:
         r_ij (numpy array): the distance between ri & rj
@@ -30,7 +29,7 @@ def Ewald_short_energy_ij(r_ij,qi,qj,r_cut):
 
 #Computes the total Ewald short energy
 @nb.jit(nopython = True)
-def Ewald_short_energy(positions, Ewald_neighbourlists, r_cut):    
+def Ewald_short_energy(positions, Ewald_neighbourlists, q, r_cut):    
     '''
     arguments:
         positions (numpy array): list of 3d numpy arrays of positions for each particle. 
@@ -105,14 +104,14 @@ def cal_k_vectors(k_c, box):
 
 #Calculte total Ewald long range energy
 @nb.jit(nopython = True)
-def Ewald_long_energy(positions,EWald_neighbourlists,q,r_cut,box):
+def Ewald_long_energy(positions,q,r_cut,box):
     '''
     arguments:
         positions: the chage value
+        q:value of charge
         r_c (float): cutoff radius for Ewald
+        box: the boxsize vector
     '''
-    
-    
     
     #prefactor & parameters
     V=np.prod(box)
@@ -122,22 +121,6 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_cut,box):
     sigma = cal_sigma (r_cut)
     k_vector = cal_k_vectors(k_c, box)
 
-
-     #create the counted r array
-    if Ewald_neighbourlists is None:
-        # raise Exception('compute EWald_neighbourlists for particles before computing EWald energy!')
-        return None
-    r_number = 0 #the number of counted position (r)
-    for i in range(len(positions)):
-        k = 0
-        j = Ewald_neighbourlists[i][k]  #NB EWald_neighbourlists[i] contains only the neighbours of particle i with indices j>i. 
-                                    # Thus interactions are NOT counted twice by computing in this manner.
-        while j!=-1: # -1 means no more neighbours in list
-            r_number += 1
-
-            k += 1
-            j = Ewald_neighbourlists[i][k]
-    
 
     #calculte the long energy  
     Ewald_long_energy = 0.0
@@ -149,9 +132,9 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_cut,box):
         k_length = np.linalg.norm (k) 
         k_length2 = k_length**2 
         
-        for j in range (len(r_number)):
-             charge = q[i]
-             r_str = r [i] 
+        for j in range (positions):
+             charge = q[j]
+             r_str = positions[j] 
              str_fac += charge*np.cos(np.dot(k,r_str))
         
 
@@ -194,8 +177,8 @@ def Ewald_self_energy(positions,q,r_cut):
 def Ewald_energy(positions,EWald_neighbourlists,q,r_c,r_s,boxsize):
     r_cut = r_c + r_s    
     
-    Ewald_short = Ewald_short_energy(positions, Ewald_neighbourlists, r_cut)
-    Ewald_long = Ewald_long_energy(positions,EWald_neighbourlists,q,r_cut,box)
+    Ewald_short = Ewald_short_energy(positions, Ewald_neighbourlists,q,r_cut)
+    Ewald_long = Ewald_long_energy(positions,q,r_cut,box)
     Ewald_self = Ewald_self_energy(positions,q,r_cut)
     
     return Ewald_short + Ewald_long - Ewald_self
