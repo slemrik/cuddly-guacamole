@@ -143,8 +143,11 @@ class Box(object):
         """
 
         original_temp = float(self.temp) # store original box temperature
-        original_pos_history = list(self.pos_history) # store pos_history from last simulation  
-        original_pot_history = list(self.pot_history)
+        no_pos_history_yet = True
+        if self.pos_history is not None:
+            original_pos_history = list(self.pos_history) # store pos_history from last simulation  
+            original_pot_history = list(self.pot_history)
+            no_pos_history_yet = False
 
         temp_decrease_factors = 1.0/(np.asarray(range(1, n_opt_max+1), dtype = float)) # reduce temperature from optimisation round i-1 to i by temp_decrease_factors[i]
         temperatures = self.temp * temp_decrease_factors
@@ -167,8 +170,12 @@ class Box(object):
                 raise ValueError('No change in potential during optimisation step. Optimisation stuck... Please try again.')    
 
         self.temp = original_temp # reset temperature  
-        self.pos_history = original_pos_history # reset pos_history to the position history of the last simulation
-        self.pot_history = original_pot_history      
+        if no_pos_history_yet:
+            self.pos_history = None
+            self.pot_history = None
+        else:
+            self.pos_history = original_pos_history # reset pos_history to the position history of the last simulation
+            self.pot_history = original_pot_history      
         
 
 
