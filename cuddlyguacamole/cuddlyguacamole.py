@@ -51,6 +51,12 @@ def simulate(filename='sodium-chloride-example.npz'):
     box.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
     box.simulate(n_steps_sim, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
 
+    pos_history = box.pos_history
+    pot_history = np.asarray(box.pot_history)
+
+    plot.create_plot(boxsize[1], pos_history, pot_history, r_cut_LJ, n_steps_opt, n_skip)
+    print('running time:',time.time() - start)
+
 def create_particle_object(parameters, positions, types):
     particles = []
 
@@ -64,4 +70,4 @@ def create_particle_object(parameters, positions, types):
 
     return particles
 
-optimize('sodium-chloride-example.npz')
+simulate('sodium-chloride-example.npz')
