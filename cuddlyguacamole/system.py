@@ -164,7 +164,7 @@ class Box(object):
             self.temp = temperatures[i] # decrease temperature before running simulation
             self.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
             print("new LJ potential = ", self.LJpotential, "kJ/mol")
-            print("change = ", self.LJpotential - LJpotential_old)
+            print("change = ", self.LJpotential - LJpotential_old, "kJ/mol")
             print("rel.change =", (self.LJpotential - LJpotential_old)/self.LJpotential, "\n -------")
             i += 1
             if save_system_history: # store system history

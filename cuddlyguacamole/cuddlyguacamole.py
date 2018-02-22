@@ -2,30 +2,28 @@ import load
 import system
 import numpy as np
 
-temp = 120 #these could be somwhere more general place
-dim = 3
 
-r_cut_LJ = 2.5
-r_skin_LJ = 0
-
-bsize=5 #??????
-
+r_cut_LJ = 2.5*(3.3284+4.40104)/2
 n_opt_max = 30
 n_steps_opt = 1000
-tol_opt = 1/100
-n_reuse_nblist = 1
+tol_opt = 1/500
+n_reuse_nblist = 50
 n_skip = int(n_steps_opt/50)
-width = bsize / 1000
-save_system_history = True
-
 n_steps_sim = 5*n_steps_opt
 
-def optimize(filename='sodium-chloride-example.npz'):
+def optimize(filename='sodium-chloride-example.npz', dim=3, temp=120, width = 0, tol_opt = 1/500, ):
     print('optimize')
     parameters, positions, types, boxsize = load.load_input_file(filename)
     particles = create_particle_object(parameters, positions, types)
-    boxsize = 5*np.ones(3) #remove it when size bug is solved
+    print(parameters)
     box = system.Box(dim, boxsize, particles, temp)
+
+
+    if width == 0: # if no width specified
+        width = boxsize[0]/5000
+    r_skin_LJ = 2*n_reuse_nblist*np.linalg.norm(width*np.ones(3))
+    save_system_history = True
+
 
     box.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
     box.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
