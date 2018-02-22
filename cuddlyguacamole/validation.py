@@ -114,13 +114,13 @@ pot_history = np.asarray(ourbox.pot_history) #kb*10**10 to get potential in Joul
 # print(pot_increases)
 # print(pot_decreases)
 
-entire_pot_history = []
-for pot_history_opt_round_i in ourbox.optimisation_pot_history:
-    for pot_step_j_opt_round_i in pot_history_opt_round_i[0:-1]:
-        #entire_pot_history.append(kb*10**10*pot_step_j_opt_round_i)
-        entire_pot_history.append(pot_step_j_opt_round_i)
+# entire_pot_history = []
+# for pot_history_opt_round_i in ourbox.optimisation_pot_history:
+#     for pot_step_j_opt_round_i in pot_history_opt_round_i:
+#         #entire_pot_history.append(kb*10**10*pot_step_j_opt_round_i)
+#         entire_pot_history.append(pot_step_j_opt_round_i)
 
-entire_pot_history = np.asarray(entire_pot_history)
+# entire_pot_history = np.asarray(entire_pot_history)
 
 ############################################################################################################
 # Comparison with ideal gas configuration:
@@ -157,7 +157,7 @@ radii = shell_rad[1:]
 # print(rdf)
 # print(sum(igas_particles_within_shell))
 
-r_Max = r_cut_LJ*1/2
+r_Max = r_cut_LJ*1.5
 dr = r_cut_LJ/30
 rdf, radii, _ = rdff.pairCorrelationFunction_3D(pos_history[0][:,0], pos_history[0][:,1], pos_history[0][:,2], bsize, r_Max, dr)
 for i in range(1, len(pos_history)):
