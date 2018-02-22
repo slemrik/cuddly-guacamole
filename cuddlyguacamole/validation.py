@@ -30,7 +30,7 @@ bsize = 25
 boxsize = np.ones(dim)*bsize # size of our system box
 temperature = 120
 
-r_cut_LJ = 5.5 # cut-off radius for LJ potential computation
+r_cut_LJ = 5 # cut-off radius for LJ potential computation
 n_steps_opt = 1000 # no. of steps to simulate
 n_steps_sim = 5*n_steps_opt
 n_reuse_nblist = 1 # update the neighbourlist for each particle only every n_reuse_nblist steps
