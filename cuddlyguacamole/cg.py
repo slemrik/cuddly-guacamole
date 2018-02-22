@@ -1,0 +1,4 @@
+import cuddlyguacamole
+
+
+cuddlyguacamole.optimize()

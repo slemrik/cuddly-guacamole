@@ -155,11 +155,15 @@ class Box(object):
         
         i=0
         LJpotential_old = 1e16
+        print("initial LJ potential = ", self.LJpotential, "kJ/mol")
+        if self.LJpotential == 0:
+                raise ValueError('Initial potential 0. Please try with a larger cut-off radius.')    
+
         while np.abs((self.LJpotential - LJpotential_old)/self.LJpotential) > tol_opt and i < n_opt_max:
             LJpotential_old = self.LJpotential
             self.temp = temperatures[i] # decrease temperature before running simulation
             self.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
-            print("new potential = ", self.LJpotential)
+            print("new LJ potential = ", self.LJpotential, "kJ/mol")
             print("change = ", self.LJpotential - LJpotential_old)
             print("rel.change =", (self.LJpotential - LJpotential_old)/self.LJpotential, "\n -------")
             i += 1

@@ -20,13 +20,13 @@ start = time.time()
 # kb = 1.38064852*10**(-23) # N*m/K (Boltzmann constant)
 kb = 0.008314462175 # kJ/(mol*K)  
 # xenon & argon: http://pbx-brasil.com/outrasDisciplinas/DinMol/Notas/IIarea/aula203/papers/PhysRev.159.98.pdf
-sigma_argon = 4.4 # Å? 3.3
-epsilon_argon = 0.41 # 0.01 kJ/mol (?)
+sigma_argon = 1 # Å? 3.3
+epsilon_argon = 1 # 0.01 kJ/mol (?)
 # sigma_xenon = 4.07 # Å
 # epsilon_xenon = 225.3 # actually epsilon/kb (K) <- thus potential is actually potential/kb
 
 dim = 3 # spatial dimension of system
-bsize = 25
+bsize = 5
 boxsize = np.ones(dim)*bsize # size of our system box
 temperature = 120
 
@@ -37,7 +37,7 @@ n_reuse_nblist = 1 # update the neighbourlist for each particle only every n_reu
 n_skip = int(n_steps_opt/50) # only save the system history every n_skip steps
 width = bsize / 1000 #r_cut_LJ / (n_reuse_nblist*20)
 r_skin_LJ = 0 # skin region for LJ potential computation
-n_particles = 128    
+n_particles = 64  
 
 
 ############################################################################################################
