@@ -166,7 +166,7 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
 def Ewald_self_energy_ij(q,r_c):    
     '''
     arguments:
-        q: the chage value
+        q: the charge value
         r_c (float): cutoff radius for Ewald
     '''
     Ewald_energy_ij = 1/(2 * epsilon * sigma(r_c) * (2* math.pi)**(3/2))*(q**2)
@@ -189,7 +189,7 @@ def Ewald_self_energy(positions,q,r_c):
     return Ewald_self
 
 @nb.jit(nopython = True)
-def Ewald_energy():    
+def Ewald_energy(positions,EWald_neighbourlists,q,r_c,r_s,boxsize):    
     Ewald_short = Ewald_short_energy(positions, Ewald_neighbourlists, r_c, r_s)
     Ewald_long = Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box)
     Ewald_self = Ewald_self_energy(positions,q,r_c)
