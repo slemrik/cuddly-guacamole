@@ -7,6 +7,21 @@ Python module that
 
 using the Metropolis MCMC algorithm with Coulomb and LJ potential.
 
+### how to use:
+install package:
+	got to package folder 
+		`pip install .`
+	import package: 
+		`import cuddlyguacamole as cd`
+	required input fileformat: 'sodium-chloride-example.npz'
+	run optimalization: 
+		`cd.optimize('sodium-chloride-example.npz')`
+	run simulation: 
+		`cd.simulate('sodium-chloride-example.npz')`
+
+test in terminal:
+`setup.py test`
+
 ### Group members include 
 
 * Eva Bertalan
@@ -14,7 +29,3 @@ using the Metropolis MCMC algorithm with Coulomb and LJ potential.
 * Jiasheng Lai
 * Pooja Pandey
 * Yuanwei Pi
-
-### how to use:
-test in terminal:
-...
