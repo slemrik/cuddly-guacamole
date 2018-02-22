@@ -22,7 +22,7 @@ def LJ_potential(positions, LJneighbourlists, sigmas, epsilons, r_c, r_s, boxsiz
     '''Computes the total Lennard Jones potential of the system configuration of *box*.
     
     arguments:
-        positions (numpy array): list of 3d numpy arrays of positions for each particle. 
+        positions (numpy array): array of 3d numpy arrays of positions for each particle. 
         LJneighbourlists (numpy array): list of numpy arrays of integers of various sizes. LJneighbourlists[i] gives
         the indices of all particles that are in the neighbourlist of particle i in our system
         sigmas (numpy array of float): sigma for each particle

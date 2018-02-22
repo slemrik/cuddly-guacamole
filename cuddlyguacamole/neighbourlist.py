@@ -29,9 +29,6 @@ def verlet_neighbourlist(positions, r_cut, r_skin, boxsize):
                                                         # appear in the nblist of j... thus the neighbourlist is not always a 
                                                         # true neighbourlist for each individual particle. But it does record of 
                                                         # each pair of neighbours in any case 
-            # print(i, positions[i])
-            # print(j, positions[j])
-            # print(np.linalg.norm(positions[i] - positions[j]))
             if np.linalg.norm(pbc.enforce_pbc_distance(positions[i] - positions[j], boxsize)) < r_cutt:
                 neighbourlists[i][k] =  j
                 k += 1
