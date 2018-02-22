@@ -69,5 +69,3 @@ def create_particle_object(parameters, positions, types):
         particles.append(system.Particle(position, charge, sigmaLJ, epsilonLJ))
 
     return particles
-
-simulate('sodium-chloride-example.npz')
