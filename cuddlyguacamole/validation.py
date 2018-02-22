@@ -89,7 +89,7 @@ ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 ############################################################################################################
 
 save_system_history = True
-n_opt_max = 30
+n_opt_max = 50
 # tol_opt = ourbox.size[0]/100
 tol_opt = 1/100
 # ourbox.optimize(n_opt, tol_opt, 20*int(n_steps_opt/n_opt), n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
@@ -128,7 +128,7 @@ pot_history = np.asarray(ourbox.pot_history) #kb*10**10 to get potential in Joul
 
 # Histogram bins: 
 no_of_bins = 30
-r_Max = r_cut_LJ*1.5
+r_Max = r_cut_LJ*2
 shell_rad = np.linspace(0, r_Max, no_of_bins)
 radii = shell_rad[1:]
 # shell_rad = np.linspace(0, bsize/np.cbrt(4*np.pi/3), no_of_bins) # r = bsize/(4*pi/3)^(1/3) to get same volume for (ideal gas) ball as cubic box. Assuming 3d...

@@ -1,7 +1,6 @@
 import numpy as np
 import lennardjones
 import neighbourlist
-import copy
 import pbc
 import metropolis
 
@@ -36,8 +35,10 @@ class Box(object):
         - LJpotential (float): current total Lennard Jones potential of the system
         - temp (float): the system temperature
         - kb (float): value of the Boltzmann constant (which unit/value kb is given in decides the unit of the LJ potential). Default is kJ/(mol*K)
-        - LJneighbourlists (NxN numpy array of int (N = # particles)): the leftmost part of row i lists the indices
-            of the neighbouring particles of particle i (particles within the LJ cutoff radius). The rest of the row contains -1's.
+        - LJneighbourlists (NxN numpy array of int (N = # particles)): the leftmost part of LJneigbourlists[i] (row i in the array) lists the indices
+            of the "neighbouring particles" (particles within the LJ cutoff radius) of particle i [NB! LJneigbourlists[i] contains only the neighbours
+            of particle i with indices j>i! Thus LJneighbourlists does contain all pairs of neighbours, but a particular row may not contain all the neighbours
+            of that particle]. The rest of the row contains -1's. 
         - sigmas (numpy array of float): array containing sigma for each particle in the system
         - epsilons (numpy array of float): array containing epsilon for each particle in the system 
         - r_c_LJ (float): cutoff radius for LJ potential calculation

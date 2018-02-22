@@ -2,20 +2,22 @@ import numpy as np
 import system
 import numba as nb
 import pbc
-from numba import cuda
-from numba import vectorize 
 
-# @vectorize(['float32(float32, float32, float32)'], target = 'cuda')
 @nb.jit#(nopython = True)
 def verlet_neighbourlist(positions, r_cut, r_skin, boxsize):
-    """Verlet neighbourlist computation: for each of the particles in the array *box.particles*,
-    we compute a neighbourlist of particles that lie within a cutoff radius r_cut+r_skin. 
-    Returns an updated list of numpy arrays neighbourlists where each array contains the neighbourlist for that particle.
+    """Neighbourlist computation.
 
-    arguments:
-        positions (nparticles x dimension numpy array of float: lists pos of particles in system
-        r_cut: verlet cutoff radius
-        r_skin: size of verlet skin region
+    Arguments:
+        positions (N x dimension numpy array of float (N=#particles)): lists positions of particles in system
+        r_cut (float): verlet cutoff radius
+        r_skin (float): size of verlet skin region
+        boxsize (float): size of system box (for computing distances using pbc)
+
+    Returns:
+        neighbourlists (NxN array of int): the leftmost part of neigbourlists[i] (row i in the array) lists the indices
+            of the "neighbouring particles" (particles within the cutoff radius) of particle i [NB! neigbourlists[i] contains only the neighbours
+            of particle i with indices j>i! Thus neighbourlists does contain all pairs of neighbours, but a particular row may not contain all the neighbours
+            of that particle]. The rest of row i contains -1's, thus once a -1 is encountered in the row, one knows there are no more neighbours. 
     """
     N = len(positions)
     r_cutt = r_cut + r_skin
