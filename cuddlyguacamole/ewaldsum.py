@@ -27,6 +27,40 @@ def Ewald_short_energy_ij(r_ij,qi,qj,r_c):
     
     return Ewald_energy_ij
 
+def Ewald_short_energy(positions, Ewald_neighbourlists, r_c, r_s):    
+    '''Computes the total Lennard Jones potential of the system configuration of *box*.
+    
+    arguments:
+        positions (numpy array): list of 3d numpy arrays of positions for each particle. 
+        EWald_neighbourlists (numpy array): list of numpy arrays of integers of various sizes. EWald_neighbourlists[i] gives
+        the indices of all particles that are in the neighbourlist of particle i in our system
+        r_c (float): cutoff radius for Ewald_enery
+        r_s (float): size of skin region for Ewald_energy
+    '''
+
+    if Ewald_neighbourlists is None:
+        # raise Exception('compute EWald_neighbourlists for particles before computing EWald energy!')
+        return None
+
+    r_cut = r_c + r_s
+
+    Ewald_short_energy = 0.0
+
+    for i in range(len(positions)):
+        k = 0
+        j = Ewald_neighbourlists[i][k]  #NB EWald_neighbourlists[i] contains only the neighbours of particle i with indices j>i. 
+                                    # Thus interactions are NOT counted twice by computing in this manner.
+        while j!=-1: # -1 means no more neighbours in list
+            r = np.linalg.norm(pbc.enforce_pbc_distance(positions[j] - positions[i], boxsize))
+            
+            Ewald_short_energy += Ewald_short_energy_ij(r,q[i],q[j],r_cut)
+            
+            k += 1
+            j = Ewald_neighbourlists[i][k]
+
+    return Ewald_short_energy
+
+
 #for long energy
 @nb.jit(nopython = True)
 def k_cut_off (r_cut) :
@@ -50,7 +84,7 @@ def sigma (r_c) :
 
 @nb.jit(nopython = True)
 def k_vectors(k_c, box): 
-    '''Generate k_vectors with k_cutoff and box
+   '''Generate k_vectors with k_cutoff and box
     
     arguments:
         k_c (float): k space cutoff radius for Ewald
@@ -123,7 +157,7 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
     return Ewald_long_energy
 
 @nb.jit(nopython = True)
-def Ewald_self_energy_ij(r_ij,qi,qj,r_c):
+def Ewald_self_energy_ij(qi,qj,r_c):
     
     '''Computes the total Ewald_short_energy for single step.
 
@@ -137,42 +171,17 @@ def Ewald_self_energy_ij(r_ij,qi,qj,r_c):
     return Ewald_energy_ij
 
 
+def Ewald_self_energy(positions,q,r_c):
+    Ewald_self = 0
+    for i in range(len(positions)):
+        Ewald_self += Ewald_self_energy_ij(r_c)
+    
+
+    return Ewald_self
 
 @nb.jit(nopython = True)
-def Ewald_enery(positions, Ewald_neighbourlists, r_c, r_s):    
-    '''Computes the total Lennard Jones potential of the system configuration of *box*.
-    
-    arguments:
-        positions (numpy array): list of 3d numpy arrays of positions for each particle. 
-        EWald_neighbourlists (numpy array): list of numpy arrays of integers of various sizes. EWald_neighbourlists[i] gives
-        the indices of all particles that are in the neighbourlist of particle i in our system
-        r_c (float): cutoff radius for Ewald_enery
-        r_s (float): size of skin region for Ewald_energy
-    '''
-
-
-    if Ewald_neighbourlists is None:
-        # raise Exception('compute EWald_neighbourlists for particles before computing EWald energy!')
-        return None
-
-    r_cut = r_c + r_s
-
-    Ewald_short_energy = 0.0
-    
-    Ewald_self_energy = 0.0
-
-    for i in range(len(positions)):
-        k = 0
-        j = Ewald_neighbourlists[i][k]  #NB EWald_neighbourlists[i] contains only the neighbours of particle i with indices j>i. 
-                                    # Thus interactions are NOT counted twice by computing in this manner.
-        while j!=-1: # -1 means no more neighbours in list
-            r = np.linalg.norm(pbc.enforce_pbc_distance(positions[j] - positions[i], boxsize))
-            
-            Ewald_short_energy += Ewald_short_energy_ij(r,q[i],q[j],r_cut)
-            Ewald_self_energy += Ewald_self_energy_ij(r,q[i],q[j],r_cut)
-            Ewald_long_energy = Ewald_long_energy(r,Ewald_neighbourlists,q,r_c,r_s,box)
-            
-            k += 1
-            j = Ewald_neighbourlists[i][k]
-
-    return Ewald_short_energy + Ewald_long_energy - Ewald_self_energy
+def Ewald_energy():    
+    Ewald_short = Ewald_short_energy(positions, Ewald_neighbourlists, r_c, r_s)
+    Ewald_long = Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box)
+    Ewald_self = Ewald_self_energy(positions,q,r_c)
+    return Ewald_short + Ewald_long - Ewald_self
