@@ -14,7 +14,7 @@ epsilon = 8.854187817e-12
 @nb.jit(nopython = True)
 def Ewald_short_energy_ij(r_ij,qi,qj,r_c):
     alpha = 1/(2**(1/2))/sigma(r_c)
-    Ewald_energy_ij = qi*qj*1/(8*pi*epsilon) * math.erfc(alpha*r_ij)/r_ij
+    Ewald_energy_ij = qi*qj*1/(8*math.pi*epsilon) * math.erfc(alpha*r_ij)/r_ij
     
     return Ewald_energy_ij
 
@@ -64,7 +64,7 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
 
     for i in range(len(positions)):
         k = 0
-        j = EWald_neighbourlists[i][k]  #NB LJneigbourlists[i] contains only the neighbours of particle i with indices j>i. 
+        j = EWald_neighbourlists[i][k]  #NB EWald_neighbourlists[i] contains only the neighbours of particle i with indices j>i. 
                                     # Thus interactions are NOT counted twice by computing in this manner.
         while j!=-1: # -1 means no more neighbours in list
             r = np.linalg.norm(pbc.enforce_pbc_distance(positions[j] - positions[i], boxsize))
@@ -100,7 +100,7 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
 @nb.jit(nopython = True)
 def Ewald_self_energy_ij(r_ij,qi,qj,r_c):
     
-    Ewald_energy_ij = 1/(2*epsilon*sigma(r_c)*(2*pi)**(3/2))(qi**2)
+    Ewald_energy_ij = 1/(2*epsilon*sigma(r_c,p)*(2*math.pi)**(3/2))(qi**2)
     return Ewald_energy_ij
 
 
@@ -130,7 +130,7 @@ def Ewald_enery(positions, EWald_neighbourlists, r_c, r_s):
 
     for i in range(len(positions)):
         k = 0
-        j = EWald_neighbourlists[i][k]  #NB LJneigbourlists[i] contains only the neighbours of particle i with indices j>i. 
+        j = EWald_neighbourlists[i][k]  #NB EWald_neighbourlists[i] contains only the neighbours of particle i with indices j>i. 
                                     # Thus interactions are NOT counted twice by computing in this manner.
         while j!=-1: # -1 means no more neighbours in list
             r = np.linalg.norm(pbc.enforce_pbc_distance(positions[j] - positions[i], boxsize))
