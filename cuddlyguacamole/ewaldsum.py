@@ -13,10 +13,8 @@ epsilon = 8.854187817e-12
 
 @nb.jit(nopython = True)
 def Ewald_short_energy_ij(r_ij,qi,qj,r_c):
-    alpha = 1/(2**(1/2))/sigma(r_c)
-    Ewald_energy_ij = qi*qj*1/(8*math.pi*epsilon) * math.erfc(alpha*r_ij)/r_ij
-    
-    return Ewald_energy_ij
+    alpha = 1/(2**(1/2))/sigma(r_c,p)
+    Ewald_energy_ij = qi*qj*1/(8*np.pi*epsilon) * math.erfc(alpha*r_ij)/r_ij
 
 #for long energy
 @nb.jit(nopython = True)
@@ -100,7 +98,7 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
 @nb.jit(nopython = True)
 def Ewald_self_energy_ij(r_ij,qi,qj,r_c):
     
-    Ewald_energy_ij = 1/(2*epsilon*sigma(r_c,p)*(2*math.pi)**(3/2))(qi**2)
+    Ewald_energy_ij = 1/(2 * epsilon * sigma(r_c,p) * (2* math.pi)**(3/2))*(qi**2)
     return Ewald_energy_ij
 
 
