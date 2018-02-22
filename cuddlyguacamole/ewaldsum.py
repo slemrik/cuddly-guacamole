@@ -48,7 +48,7 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
 
     r_cut = r_c + r_s
     
-    #prefactor 
+    #prefactor & parameters
     V=np.prod(box)
     pre_fac = 1/(2*V*epsilon)  
 
@@ -56,23 +56,24 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
     sigma = sigma (r_cut,p)
     k_vector = k_vectors(k_c, box)
 
-    
 
+     #create the counted r array
     if EWald_neighbourlists is None:
         # raise Exception('compute EWald_neighbourlists for particles before computing EWald energy!')
         return None
 
-    
-
-
-    ##
     for i in range(len(positions)):
         k = 0
         j = EWald_neighbourlists[i][k]  #NB LJneigbourlists[i] contains only the neighbours of particle i with indices j>i. 
                                     # Thus interactions are NOT counted twice by computing in this manner.
         while j!=-1: # -1 means no more neighbours in list
             r = np.linalg.norm(pbc.enforce_pbc_distance(positions[j] - positions[i], boxsize))
+            
+            k += 1
+            j = EWald_neighbourlists[i][k]
     
+
+    #calculte the long energy  #PROBLEM
     Ewald_long_energy = 0.0
     str_factor = 0.0
 
@@ -101,8 +102,6 @@ def Ewald_self_energy_ij(r_ij,qi,qj,r_c):
     
     Ewald_energy_ij = 1/(2*epsilon*sigma(r_c)*(2*pi)**(3/2))(qi**2)
     return Ewald_energy_ij
-
-
 
 
 
