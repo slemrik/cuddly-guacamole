@@ -16,11 +16,7 @@ def generate_test_system(dim = 3, boxsize = 5*np.ones(3), nparticles = 64, temp 
     xyz = np.vstack((x.flat, y.flat, z.flat)).T
     xyz = np.ascontiguousarray(xyz)
 
-    positions = sorted(xyz, key=lambda k: random.random())[0:nparticles]
-
-    # for i in range(len(positions)):
-    #     tmp_pos = np.array(positions[i])
-    #     positions[i] = pbc.enforce_pbc_coordinates(positions[i], boxsize)    
+    positions = sorted(xyz, key=lambda k: random.random())[0:nparticles] 
 
     particles = []
     for i in range(nparticles):
