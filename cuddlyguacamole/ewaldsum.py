@@ -170,9 +170,9 @@ def Ewald_enery(positions, Ewald_neighbourlists, r_c, r_s):
             
             Ewald_short_energy += Ewald_short_energy_ij(r,q[i],q[j],r_cut)
             Ewald_self_energy += Ewald_self_energy_ij(r,q[i],q[j],r_cut)
+            Ewald_long_energy = Ewald_long_energy(r,Ewald_neighbourlists,q,r_c,r_s,box)
             
             k += 1
             j = Ewald_neighbourlists[i][k]
 
-    Ewald_long_energy = Ewald_long_energy(r,Ewald_neighbourlists,q,r_c,r_s,box)
     return Ewald_short_energy + Ewald_long_energy - Ewald_self_energy
