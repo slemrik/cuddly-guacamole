@@ -72,7 +72,7 @@ def mcmc(box, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut
     positions_history = [np.array(box.positions)]             
     # (Compute then) Store initial total LJ potential:
     if box.LJpotential is None:
-        box.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
+        box.compute_LJ_potential()
     potLJ_history = [box.LJpotential]
 
     p_acc_vec = [] # just for testing
@@ -87,8 +87,8 @@ def mcmc(box, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut
                     box.positions = np.array(positions_new)
                     box.update_particle_positions()
                     if update_nblist:
-                        box.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
-                    box.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
+                        box.LJneighbourlists = box.compute_LJneighbourlist()
+                    box.LJpotential = box.compute_LJ_potential()
         # if (box.LJpotential>box_old.LJpotential):
         #     print("increase = " + repr(box.LJpotential-box_old.LJpotential))
         #     print("acceptance prob. = " + repr(p_acc))
