@@ -6,16 +6,15 @@ import numba as nb
 from numba import cuda
 from numba import vectorize 
 
-p = 1e-6 #accuracy set to 1e-6 gives p??????
+p = 10 #accuracy set to 1e-6 gives p??????
 epsilon = 8.854187817e-12
 #https://en.wikipedia.org/wiki/Vacuum_permittivity
 
-
+#Computes the total Ewald_short_energy for single step.
 @nb.jit(nopython = True)
 def Ewald_short_energy_ij(r_ij,qi,qj,r_c):
     
-    '''Computes the total Ewald_short_energy for single step.
-
+    '''
     arguments:
         r_ij (numpy array): the distance between ri & rj
         qi: the chage of qj (+1 or -1)
@@ -27,9 +26,10 @@ def Ewald_short_energy_ij(r_ij,qi,qj,r_c):
     
     return Ewald_energy_ij
 
+#Computes the total Ewald short energy
+@nb.jit(nopython = True)
 def Ewald_short_energy(positions, Ewald_neighbourlists, r_c, r_s):    
-    '''Computes the total Lennard Jones potential of the system configuration of *box*.
-    
+    '''
     arguments:
         positions (numpy array): list of 3d numpy arrays of positions for each particle. 
         EWald_neighbourlists (numpy array): list of numpy arrays of integers of various sizes. EWald_neighbourlists[i] gives
@@ -101,10 +101,15 @@ def k_vectors(k_c, box):
    return k_vector 
 
 
-
+#Calculte total Ewald long range energy
 @nb.jit(nopython = True)
 def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
-
+    '''
+    arguments:
+        positions: the chage value
+        r_c (float): cutoff radius for Ewald
+    '''
+    
     r_cut = r_c + r_s
     
     #prefactor & parameters
@@ -132,7 +137,7 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
             j = Ewald_neighbourlists[i][k]
     
 
-    #calculte the long energy  #PROBLEM
+    #calculte the long energy  
     Ewald_long_energy = 0.0
     str_factor = 0.0
 
@@ -156,25 +161,29 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
 
     return Ewald_long_energy
 
+#Calculte single step of Ewald self energy
 @nb.jit(nopython = True)
-def Ewald_self_energy_ij(qi,qj,r_c):
-    
-    '''Computes the total Ewald_short_energy for single step.
-
+def Ewald_self_energy_ij(q,r_c):    
+    '''
     arguments:
-        r_ij (numpy array): the distance between ri & rj
-        qi: the chage of qj (+1 or -1)
-        qj: the charge of qj (+1 or -1) 
+        q: the chage value
         r_c (float): cutoff radius for Ewald
     '''
-    Ewald_energy_ij = 1/(2 * epsilon * sigma(r_c) * (2* math.pi)**(3/2))*(qi**2)
+    Ewald_energy_ij = 1/(2 * epsilon * sigma(r_c) * (2* math.pi)**(3/2))*(q**2)
     return Ewald_energy_ij
 
-
+#Calculte total Ewald self energy
+@nb.jit(nopython = True)
 def Ewald_self_energy(positions,q,r_c):
+    '''
+    arguments:
+        q: the chage value
+        r_c (float): cutoff radius for Ewald
+    '''
+
     Ewald_self = 0
     for i in range(len(positions)):
-        Ewald_self += Ewald_self_energy_ij(r_c)
+        Ewald_self += Ewald_self_energy_ij(q[i],r_c)
     
 
     return Ewald_self
