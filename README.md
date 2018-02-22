@@ -10,11 +10,15 @@ using the Metropolis MCMC algorithm with Coulomb and LJ potential.
 ### how to use:
 install package:
 	
-	1. got to package folder `pip install .`
-	2. import package: `import cuddlyguacamole as cd`
+	1. got to package folder 
+		`pip install .`
+	2. import package: 
+		`import cuddlyguacamole as cd`
 	3. required input fileformat: 'sodium-chloride-example.npz'
-	4. run optimalization: `cd.optimize('sodium-chloride-example.npz')`
-	5. run simulation: `cd.simulate('sodium-chloride-example.npz')`
+	4. run optimalization: 
+		`cd.optimize('sodium-chloride-example.npz')`
+	5. run simulation: 
+		`cd.simulate('sodium-chloride-example.npz')`
 
 test in terminal:
 `setup.py test`
