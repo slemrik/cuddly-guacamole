@@ -12,7 +12,7 @@ epsilon = 8.854187817e-12
 
 #Computes the total Ewald_short_energy for single step.
 @nb.jit(nopython = True)
-def Ewald_short_energy_ij(r_ij,qi,qj,r_c):
+def Ewald_short_energy_ij(r_ij,qi,qj,r_cut):
     
     '''
     arguments:
@@ -21,14 +21,15 @@ def Ewald_short_energy_ij(r_ij,qi,qj,r_c):
         qj: the charge of qj (+1 or -1) 
         r_c (float): cutoff radius for Ewald
     '''
-    alpha = 1/(2**(1/2))/sigma(r_c) #the factor in the Ewald
+
+    alpha = 1/(2**(1/2))/cal_sigma(r_cut) #the factor in the Ewald
     Ewald_energy_ij = qi*qj*1/(8*np.pi*epsilon) * math.erfc(alpha*r_ij)/r_ij
     
     return Ewald_energy_ij
 
 #Computes the total Ewald short energy
 @nb.jit(nopython = True)
-def Ewald_short_energy(positions, Ewald_neighbourlists, r_c, r_s):    
+def Ewald_short_energy(positions, Ewald_neighbourlists, r_cut):    
     '''
     arguments:
         positions (numpy array): list of 3d numpy arrays of positions for each particle. 
@@ -42,7 +43,7 @@ def Ewald_short_energy(positions, Ewald_neighbourlists, r_c, r_s):
         # raise Exception('compute EWald_neighbourlists for particles before computing EWald energy!')
         return None
 
-    r_cut = r_c + r_s
+   
 
     Ewald_short_energy = 0.0
 
@@ -64,26 +65,26 @@ def Ewald_short_energy(positions, Ewald_neighbourlists, r_c, r_s):
 #for long energy
 @nb.jit(nopython = True)
 def k_cut_off (r_cut) :
-    '''Transfer r_cut to k_cut
+    '''Calculate r_cut to k_cut
 
     arguments:
         r_c (float): cutoff radius for Ewald
     '''
-    k_c = (2*p)/r_cut 
-    return k_c 
+    k_cut = (2*p)/r_cut
+    return k_cut 
 
 @nb.jit(nopython = True)
-def sigma (r_c) : 
+def cal_sigma (r_cut) : 
     '''Calculte sigma parameter with r_cut and p
     
     arguments:
         r_c (float): cutoff radius for Ewald
     '''
-    sigma = r_c / np.sqrt (2*p) 
+    sigma = r_cut / np.sqrt (2*p) 
     return sigma 
 
 @nb.jit(nopython = True)
-def k_vectors(k_c, box): 
+def cal_k_vectors(k_c, box): 
    '''Generate k_vectors with k_cutoff and box
     
     arguments:
@@ -103,22 +104,22 @@ def k_vectors(k_c, box):
 
 #Calculte total Ewald long range energy
 @nb.jit(nopython = True)
-def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
+def Ewald_long_energy(positions,EWald_neighbourlists,q,r_cut,box):
     '''
     arguments:
         positions: the chage value
         r_c (float): cutoff radius for Ewald
     '''
     
-    r_cut = r_c + r_s
+    
     
     #prefactor & parameters
     V=np.prod(box)
     pre_fac = 1/(2*V*epsilon)  
 
     k_c = k_cut_off (r_cut)
-    sigma = sigma (r_cut)
-    k_vector = k_vectors(k_c, box)
+    sigma = cal_sigma (r_cut)
+    k_vector = cal_k_vectors(k_c, box)
 
 
      #create the counted r array
@@ -163,34 +164,37 @@ def Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box):
 
 #Calculte single step of Ewald self energy
 @nb.jit(nopython = True)
-def Ewald_self_energy_ij(q,r_c):    
+def Ewald_self_energy_ij(q,r_cut):    
     '''
     arguments:
         q: the charge value
         r_c (float): cutoff radius for Ewald
     '''
-    Ewald_energy_ij = 1/(2 * epsilon * sigma(r_c) * (2* math.pi)**(3/2))*(q**2)
+    Ewald_energy_ij = 1/(2 * epsilon * cal_sigma(r_c) * (2* math.pi)**(3/2))*(q**2)
     return Ewald_energy_ij
 
 #Calculte total Ewald self energy
 @nb.jit(nopython = True)
-def Ewald_self_energy(positions,q,r_c):
+def Ewald_self_energy(positions,q,r_cut):
     '''
     arguments:
         q: the chage value
         r_c (float): cutoff radius for Ewald
     '''
-
+    
     Ewald_self = 0
     for i in range(len(positions)):
-        Ewald_self += Ewald_self_energy_ij(q[i],r_c)
+        Ewald_self += Ewald_self_energy_ij(q[i],r_cut)
     
 
     return Ewald_self
 
 @nb.jit(nopython = True)
-def Ewald_energy(positions,EWald_neighbourlists,q,r_c,r_s,boxsize):    
-    Ewald_short = Ewald_short_energy(positions, Ewald_neighbourlists, r_c, r_s)
-    Ewald_long = Ewald_long_energy(positions,EWald_neighbourlists,q,r_c,r_s,box)
-    Ewald_self = Ewald_self_energy(positions,q,r_c)
+def Ewald_energy(positions,EWald_neighbourlists,q,r_c,r_s,boxsize):
+    r_cut = r_c + r_s    
+    
+    Ewald_short = Ewald_short_energy(positions, Ewald_neighbourlists, r_cut)
+    Ewald_long = Ewald_long_energy(positions,EWald_neighbourlists,q,r_cut,box)
+    Ewald_self = Ewald_self_energy(positions,q,r_cut)
+    
     return Ewald_short + Ewald_long - Ewald_self
