@@ -14,10 +14,13 @@ install package:
 	import package: 
 		`import cuddlyguacamole as cd`
 	required input fileformat: 'sodium-chloride-example.npz'
-	run optimalization: 
-		`cd.optimize('sodium-chloride-example.npz')`
+	run optimalization: `NaCl_box = cd.optimize(filename = 'sodium-chloride-example.npz', to_plot=True)`
+	
+	Or: `NaCl_box = cd.optimize(box = NaCl_box, to_plot=True)` if you already have the `Box` object
+		
 	run simulation: 
-		`cd.simulate('sodium-chloride-example.npz')`
+		`NaCl_box = cd.simulate(filename = 'sodium-chloride-example.npz', to_plot = True, plot_rdf = True)`
+	Or:`NaCl_box = cd.simulate(box = NaCl_box, to_plot = True, plot_rdf = True)`
 
 test in terminal:
 `setup.py test`
