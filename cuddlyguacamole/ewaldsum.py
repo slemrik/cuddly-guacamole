@@ -97,8 +97,7 @@ def cal_k_vectors(k_c, box):
    for k_i in range (-k_c,k_c+1):
        for k_j in range (-k_c,k_c+1):
            for k_k in range (-k_c,k_c+1):
-                if np.linalg.norm([k_i,k_j,k_k]) <= k_c : 
-                    if k_i!=0 or k_j!=0 or k_k!=0 :   
+                if np.linalg.norm([k_i,k_j,k_k]) <= k_c and (k_i!=0 or k_j!=0 or k_k!=0):   
                 #Reciprocal  lattice vector 
                       k = 2.0*np.pi*np.array([k_i / (box[0]), k_j / (box[1]), k_k / (box[2])] )   
                       k_vector.append(k) 
@@ -137,10 +136,12 @@ def Ewald_long_energy(positions,q,r_cut,box):
              charge = q[j]
              r_str = positions[j] 
              str_fac += charge*np.cos(np.dot(k,r_str))
+             #str_fac += (charge*(np.exp((1j)*np.dot(k,r_str))))*(charge*(np.exp((1j)*np.dot(k,r_str))))
         
 
         exp_term += np.exp(-(sigma**2)*k_length2/2)/k_length2 
         Ewald_long_energy += ((1/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac)**2)*exp_term)
+        #Ewald_long_energy += ((1/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac))*exp_term)
 
     return Ewald_long_energy 
 
