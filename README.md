@@ -16,9 +16,13 @@ install package:
 	required input fileformat: 'sodium-chloride-example.npz'
 	run optimalization: 
 		`NaCl_box = cd.optimize(filename = 'sodium-chloride-example.npz', to_plot=True)`
+		
 		OR `NaCl_box = cd.optimize(box = NaCl_box, to_plot=True)` if you already have the `Box` object
+		
 	run simulation: 
+	
 		`NaCl_box = cd.simulate(filename = 'sodium-chloride-example.npz', to_plot = True, plot_rdf = True)`
+		
 		`NaCl_box = cd.simulate(box = NaCl_box, to_plot = True, plot_rdf = True)`
 
 test in terminal:
