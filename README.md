@@ -7,26 +7,25 @@ Python module that
 
 using the Metropolis MCMC algorithm with Coulomb and LJ potential.
 
-### Presentation for Project
-https://docs.google.com/presentation/d/15cdAm8A_uyP_1DOAyDKakZ2EpgbUyPRm6zkhN1RwNFU/edit?usp=sharing
-
 ### how to use:
-install package:
+1. install package:
 got to package folder 
 	`pip install .`
 
-import package: 
+2. import package: 
 	`import cuddlyguacamole as cd`
 
+3. use methods:
 required input fileformat: 'sodium-chloride-example.npz'
-
-run optimalization: 
-		`cd.optimize('sodium-chloride-example.npz')`
+-optimalization:
+	- `NaCl_box = cd.optimize(filename = 'sodium-chloride-example.npz', to_plot=True)`
+	- if you already have the Box object: `NaCl_box = cd.optimize(box = NaCl_box, to_plot=True)` 
 		
-run simulation: 
-	`cd.simulate('sodium-chloride-example.npz')`
+- simulation: 
+	- `NaCl_box = cd.simulate(filename = 'sodium-chloride-example.npz', to_plot = True, plot_rdf = True)`
+	- if you already have the Box object: `NaCl_box = cd.simulate(box = NaCl_box, to_plot = True, plot_rdf = True)`
 
-test in terminal:
+4. test in terminal:
 `setup.py test`
 
 ### Group members include 
