@@ -5,7 +5,8 @@ import math
 import pbc
 import numba as nb
 from numba import cuda
-from numba import vectorize 
+from numba import vectorize
+import metropolis as mt
 
 ###
 with np.load('sodium-chloride-example.npz') as fh:
@@ -39,7 +40,6 @@ def Ewald_short_energy_ij(r_ij,qi,qj,r_cut):
 
     alpha = 1/(2**(1/2))/cal_sigma(r_cut) #the factor in the Ewald
     Ewald_energy_ij = qi*qj*1/(8*np.pi*epsilon) * math.erfc(alpha*r_ij)/r_ij
-    #Ewald_energy_ij = qi*qj*1/(8*np.pi*epsilon) * math.exp()
     
     return Ewald_energy_ij
 
@@ -111,8 +111,7 @@ def cal_k_vectors(k_c, box):
    for k_i in range (-k_c,k_c+1):
        for k_j in range (-k_c,k_c+1):
            for k_k in range (-k_c,k_c+1):
-                if np.linalg.norm([k_i,k_j,k_k]) <= k_c : 
-                    if k_i!=0 or k_j!=0 or k_k!=0 :   
+                if np.linalg.norm([k_i,k_j,k_k]) <= k_c and (k_i!=0 or k_j!=0 or k_k!=0):   
                 #Reciprocal  lattice vector 
                       k = 2.0*np.pi*np.array([k_i / (box[0]), k_j / (box[1]), k_k / (box[2])] )   
                       k_vector.append(k) 
@@ -153,11 +152,15 @@ def Ewald_long_energy(positions,q,r_cut,box):
         for j in range (len(positions)):
              charge = q[j]
              r_str = positions[j] 
-             str_fac += charge*np.cos(np.dot(k,r_str))
-        
+             str_fac += charge*np.sin(np.dot(k,r_str))
+             #str_fac += (charge*(np.exp((1j)*np.dot(k,r_str))))*(charge*(np.exp((1j)*np.dot(k,r_str))))
+             
 
         exp_term += np.exp(-(sigma**2)*k_length2/2)/k_length2 
-        Ewald_long_energy += ((1/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac)**2)*exp_term)
+        Ewald_long_energy += ((1/2/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac)**2)*exp_term)
+        #Ewald_long_energy += ((1/2/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac))*exp_term)
+
+
 
     return Ewald_long_energy 
 
@@ -197,14 +200,19 @@ for i in range(128):
     else:
         q[i] = 1 #* 1.602119892525e-19
 
-r_cut = 8
+#pool = ThreadPoolExecutor(max_workers=2)
+r_cut = min(box)/2
 EWald_neighbourlists = neighbourlist.verlet_neighbourlist(positions, r_cut, 0, box) 
-print(EWald_neighbourlists)
+#print(EWald_neighbourlists)
 unit_convert = (1.602119892525e-19)**2/(4*np.pi*(10**(-10)))/(8.854187817e-12) /1000/128 * 6.022140857 * 10e23
-short = Ewald_short_energy(positions,EWald_neighbourlists, q, 1,box) * unit_convert
+
+short = Ewald_short_energy(positions,EWald_neighbourlists, q, r_cut,box) * unit_convert
 l = Ewald_long_energy(positions,q,r_cut,box) * unit_convert
 s = Ewald_self_energy(positions,q,r_cut) * unit_convert
-print("The short range energy:",short,"\t(kJ/mol)")
-print("The long range energy:",l,"\t(kJ/mol)")
-print("The self energy:",s ,"\t(kJ/mol)")
-print("The total energy:",short+l-s,"(kJ/mol)")
+print("\rWith cutoff radius = half of the box length")
+print("The Ewald short range energy:",short,"\t(kJ/mol)")
+print("The Ewald long range energy:",l,"\t(kJ/mol)")
+print("The Ewald self energy:",s ,"\t(kJ/mol)")
+print("The total Ewald energy:",short+l-s,"(kJ/mol)")
+
+
