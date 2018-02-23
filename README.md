@@ -7,6 +7,9 @@ Python module that
 
 using the Metropolis MCMC algorithm with Coulomb and LJ potential.
 
+### Presentation
+https://docs.google.com/presentation/d/15cdAm8A_uyP_1DOAyDKakZ2EpgbUyPRm6zkhN1RwNFU/edit?usp=sharing
+
 ### how to use:
 1. install package:
 got to package folder 
