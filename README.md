@@ -17,7 +17,7 @@ got to package folder
 
 3. use methods:
 required input fileformat: 'sodium-chloride-example.npz'
--optimalization:
+- optimalization:
 	- `NaCl_box = cd.optimize(filename = 'sodium-chloride-example.npz', to_plot=True)`
 	- if you already have the Box object: `NaCl_box = cd.optimize(box = NaCl_box, to_plot=True)` 
 		
