@@ -117,7 +117,7 @@ class Box(object):
         Method updates the system variables *positions*, *LJpotential*, *pos_history* and *pot_history*, *LJneighbourlists*, and also updates the position
         registered to each Particle object in *particles* by calling self.update_particle_positions().
         """
-
+        
         self.positions, self.LJpotential, self.pos_history, self.pot_history = metropolis.mcmc(self, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ, self.kb)
         self.update_particle_positions()
         self.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
