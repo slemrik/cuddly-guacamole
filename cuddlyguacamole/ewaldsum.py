@@ -140,8 +140,8 @@ def Ewald_long_energy(positions,q,r_cut,box):
         
 
         exp_term += np.exp(-(sigma**2)*k_length2/2)/k_length2 
-        Ewald_long_energy += ((1/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac)**2)*exp_term)
-        #Ewald_long_energy += ((1/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac))*exp_term)
+        Ewald_long_energy += ((1/2/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac)**2)*exp_term)
+        #Ewald_long_energy += ((1/2/(np.prod(box) * epsilon)))*((np.linalg.norm(str_fac))*exp_term)
 
     return Ewald_long_energy 
 
